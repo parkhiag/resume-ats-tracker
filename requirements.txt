@@ -3,5 +3,5 @@ python-dotenv
 PyPDF2
 Pillow
 pdf2image
-openai 
+openai
 pytesseract

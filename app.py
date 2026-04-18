@@ -4,27 +4,22 @@ import streamlit as st
 import PyPDF2
 from openai import OpenAI
 import pdf2image
-from PIL import Image
-import pytesseract  
-
+import pytesseract
 
 load_dotenv()
-
 
 client = OpenAI(
     api_key=os.environ.get("GROQ_API_KEY"),
     base_url="https://api.groq.com/openai/v1",
 )
 
-
 def get_groq_response(resume_text, job_description, prompt):
     full_input = f"Resume:\n{resume_text}\n\nJob Description:\n{job_description}\n\nInstructions:\n{prompt}"
     response = client.responses.create(
         input=full_input,
-        model="openai/gpt-oss-20b",  # Groq-supported model
+        model="openai/gpt-oss-20b",
     )
     return response.output_text
-
 
 def extract_pdf_text(uploaded_file):
     """
@@ -38,25 +33,24 @@ def extract_pdf_text(uploaded_file):
             page_text = page.extract_text()
             if page_text:
                 text += page_text
+
         if text.strip():
             return text
         else:
-            
-            uploaded_file.seek(0)  # Reset file pointer
+            uploaded_file.seek(0)
             images = pdf2image.convert_from_bytes(uploaded_file.read())
             ocr_text = ""
             for img in images:
                 ocr_text += pytesseract.image_to_string(img)
             return ocr_text
-    except:
-        
+
+    except Exception:
         uploaded_file.seek(0)
         images = pdf2image.convert_from_bytes(uploaded_file.read())
         ocr_text = ""
         for img in images:
             ocr_text += pytesseract.image_to_string(img)
         return ocr_text
-
 
 st.set_page_config(page_title="ATS Resume Expert")
 st.header("ATS Tracking System")
@@ -69,7 +63,6 @@ if uploaded_file is not None:
 
 submit1 = st.button("Tell Me About the Resume")
 submit3 = st.button("Percentage Match")
-
 
 input_prompt1 = """
 You are an experienced Technical Human Resource Manager.
@@ -86,7 +79,6 @@ Return:
 2. Missing keywords
 3. Final thoughts
 """
-
 
 if submit1:
     if uploaded_file is not None:
